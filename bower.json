@@ -1,0 +1,16 @@
+{
+  "name": "reciclame",
+  "dependencies": {
+    "backbone": "~1.1.2",
+    "jquery": "~2.1.1",
+    "requirejs": "~2.1.14",
+    "lodash": "~2.4.1",
+    "qunit": "~1.14.0",
+    "jasmine": "~2.0.0",
+    "mocha": "~1.20.1",
+    "sinon": "~1.10.2",
+    "assert": "~0.1.0",
+    "backbone-react-component": "~0.8.1"
+  },
+  "devDependencies": {}
+}
