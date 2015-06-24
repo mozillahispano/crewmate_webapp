@@ -2,13 +2,21 @@ define([
   "backbone",
   "underscore",
   "react",
+  "app",
   "views/login_view",
+  "collections/projects",
+  "views/projects_view",
+  "collections/task_lists",
   "views/task_lists_view"
 ], function(
   Backbone,
   _,
   React,
+  app,
   LoginView,
+  Projects,
+  ProjectsView,
+  TaskLists,
   TaskListsView
 ) {
   "use strict";
@@ -55,17 +63,48 @@ define([
     },
 
     routes: {
-      "": "taskLists",
-      "login": "login"
+      "": "projects",
+      "login": "login",
+      "projects/:project_id/task_lists": "taskLists"
     },
 
-    taskLists: function() {
+    projects: function() {
+      var _this = this;
       var el = document.getElementById('main');
-      React.render(React.createElement(TaskListsView, null), el);
+      this.projects = new Projects();
+      this.xhr = this.projects.fetch({
+        beforeSend: function(xhr) {
+          xhr.setRequestHeader("Authorization", app.auth.get("authHash"));
+        },
+        success: function() {
+          React.render(React.createElement(ProjectsView, {
+            collection: _this.projects
+          }), el);
+        }
+      });
+    },
+
+    taskLists: function(projectId) {
+      var el = document.getElementById('main');
+      var _this = this;
+      this.taskLists = new TaskLists([], {projectId: projectId});
+      this.taskLists.fetch({
+        beforeSend: function(xhr) {
+          xhr.setRequestHeader("Authorization", app.auth.get("authHash"));
+        },
+        success: function() {
+          React.render(React.createElement(TaskListsView, {
+            collection: _this.taskLists
+          }), el);
+        }
+      });
     },
 
     login: function() {
       var el = document.getElementById('main');
+      if (this.xhr !== undefined) {
+        this.xhr.abort();
+      }
       React.render(React.createElement(LoginView, null), el);
     }
   });

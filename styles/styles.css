@@ -1,0 +1,25 @@
+.login-wrap {
+  width: 300px;
+  margin: 10% auto;
+}
+
+.login-header {
+  width: 100%;
+  height: 50px;
+  background: url('../images/crewmate-logo.gif') no-repeat;
+}
+
+.login input {
+  width: 100%;
+  height: 23px;
+  padding: 0 10px;
+}
+
+.login button {
+  margin: 15px;
+  padding: 10px;
+  background: rgb(39, 149, 182);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+}
