@@ -7,7 +7,9 @@ define([
   "collections/projects",
   "views/projects_view",
   "collections/task_lists",
-  "views/task_lists_view"
+  "views/task_lists_view",
+  "collections/tasks",
+  "views/tasks_view"
 ], function(
   Backbone,
   _,
@@ -17,7 +19,9 @@ define([
   Projects,
   ProjectsView,
   TaskLists,
-  TaskListsView
+  TaskListsView,
+  Tasks,
+  TasksView
 ) {
   "use strict";
 
@@ -65,7 +69,8 @@ define([
     routes: {
       "": "projects",
       "login": "login",
-      "projects/:project_id/task_lists": "taskLists"
+      "projects/:project_id/task_lists": "taskLists",
+      "projects/:project_id/task_lists/:task_list_id/tasks": "tasks"
     },
 
     projects: function() {
@@ -95,6 +100,23 @@ define([
         success: function() {
           React.render(React.createElement(TaskListsView, {
             collection: _this.taskLists
+          }), el);
+        }
+      });
+    },
+
+    tasks: function(projectId, taskListId) {
+      var el = document.getElementById('main');
+      var _this = this;
+      this.tasks = new Tasks([], {projectId: projectId,
+                                  taskListId: taskListId});
+      this.tasks.fetch({
+        beforeSend: function(xhr) {
+          xhr.setRequestHeader("Authorization", app.auth.get("authHash"));
+        },
+        success: function() {
+          React.render(React.createElement(TasksView, {
+            collection: _this.tasks
           }), el);
         }
       });
