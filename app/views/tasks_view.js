@@ -5,7 +5,8 @@ define([
   "views/task_column_view",
   "views/task_card_view",
   "underscore",
-  "models/task"
+  "models/task",
+  "app"
 ], function(
   React,
   Backbone,
@@ -13,11 +14,18 @@ define([
   TaskColumnView,
   TaskCardView,
   _,
-  Task) {
+  Task,
+  app) {
   var TasksView = React.createClass({
     mixins: [ReactBackboneMixin],
 
     getInitialState: function() {
+      var _this = this;
+      this.socketClient = new WebSocket(app.config.webSocketServer);
+      this.socketClient.onmessage = function(e) {
+        var obj = JSON.parse(e.data);
+        _this.updateUI(obj.lastStatus, obj.newStatus, obj.taskId);
+      };
       var tasks = {};
       this.setTaskColumns(tasks, "backlog", 0);
       this.setTaskColumns(tasks, "todo", 1);
@@ -32,6 +40,26 @@ define([
       var tasks = this.props.collection.where({status: status});
       obj[name] = tasks;
       return obj;
+    },
+
+    updateUI: function(lastStatus, newStatus, taskId) {
+      var oldTaskColumn = this.state.tasks[lastStatus];
+      var newTaskColumn = this.state.tasks[newStatus];
+      var task = _.where(oldTaskColumn, {id: taskId})[0];
+      var statusToUpdate = this.getStatus(newStatus);
+      task.set({status: statusToUpdate});
+
+      var newOldTaskColumn = _.filter(oldTaskColumn, function(taskInColumn) {
+        return taskInColumn.get('id') !== taskId;
+      });
+
+      newTaskColumn.push(task);
+
+      var tasks = this.state.tasks;
+      tasks[lastStatus] = newOldTaskColumn;
+      tasks[newStatus] = newTaskColumn;
+
+      this.setState({tasks: tasks});
     },
 
     // droppable element
@@ -83,6 +111,13 @@ define([
         this.setState({
           tasks: tasks
         });
+
+        var obj = {
+          taskId: task.id,
+          newStatus: newStatus,
+          lastStatus: oldStatus
+        };
+        this.socketClient.send(JSON.stringify(obj));
       }
     },
 
