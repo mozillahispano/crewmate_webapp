@@ -41,5 +41,12 @@ require([
     }
   });
 
+  Backbone.ajax = _.wrap(Backbone.ajax, function(fn, params) {
+    params.headers = _.extend({}, params.headers,
+      {'Authorization': app.auth.get("authHash")});
+
+    return fn.call(this, params);
+  });
+
   Backbone.history.start({ pushState: true, root: app.root });
 });

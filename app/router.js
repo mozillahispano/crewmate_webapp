@@ -78,9 +78,6 @@ define([
       var el = document.getElementById('main');
       this.projects = new Projects();
       this.xhr = this.projects.fetch({
-        beforeSend: function(xhr) {
-          xhr.setRequestHeader("Authorization", app.auth.get("authHash"));
-        },
         success: function() {
           React.render(React.createElement(ProjectsView, {
             collection: _this.projects
@@ -94,9 +91,6 @@ define([
       var _this = this;
       this.taskLists = new TaskLists([], {projectId: projectId});
       this.taskLists.fetch({
-        beforeSend: function(xhr) {
-          xhr.setRequestHeader("Authorization", app.auth.get("authHash"));
-        },
         success: function() {
           React.render(React.createElement(TaskListsView, {
             collection: _this.taskLists
@@ -111,9 +105,6 @@ define([
       this.tasks = new Tasks([], {projectId: projectId,
                                   taskListId: taskListId});
       this.tasks.fetch({
-        beforeSend: function(xhr) {
-          xhr.setRequestHeader("Authorization", app.auth.get("authHash"));
-        },
         success: function() {
           React.render(React.createElement(TasksView, {
             collection: _this.tasks
